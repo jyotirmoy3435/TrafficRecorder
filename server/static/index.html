@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Traffic Explorer</title>
+  <link rel="stylesheet" href="/viewer.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="header-left">
+        <div class="brand">
+          <span class="brand-logo">⚡</span>
+          <span class="brand-name">Traffic Explorer</span>
+          <span class="brand-badge">CDP Native</span>
+        </div>
+        <div class="server-status" id="serverStatus">
+          <span class="status-dot"></span>
+          <span class="status-text">Connecting...</span>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="stats-pill" id="storageStatsPill" title="Compression & Deduplication Savings">
+          <span>💾 Storage Saved: <strong id="savingsPercent">0%</strong></span>
+        </div>
+        <button class="btn btn-secondary" id="btnAutoRefresh" title="Toggle Auto-Refresh">
+          <span class="icon">🔄</span> Auto-Refresh: <span id="autoRefreshStatus">ON</span>
+        </button>
+        <button class="btn btn-primary" id="btnExportHar" disabled>
+          <span class="icon">📥</span> Export HAR
+        </button>
+        <button class="btn btn-secondary" id="btnExportJson" disabled>
+          <span class="icon">📄</span> Export JSON
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <div class="workspace">
+      <!-- Sidebar: Recorded Sessions -->
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <h3>Recording Sessions</h3>
+          <button class="btn-icon" id="btnRefreshSessions" title="Refresh Sessions">↻</button>
+        </div>
+        <div class="session-list" id="sessionList">
+          <div class="empty-state">No recorded sessions found. Start recording from the Chrome extension.</div>
+        </div>
+      </aside>
+
+      <!-- Main Traffic Content Area -->
+      <main class="main-panel">
+        <div class="session-hero" id="sessionHero" style="display: none;">
+          <div class="hero-info">
+            <h2 id="heroTitle">Selected Session</h2>
+            <div class="hero-meta" id="heroMeta"></div>
+          </div>
+          <div class="hero-actions">
+            <button class="btn btn-danger-outline" id="btnDeleteSession">🗑 Delete</button>
+          </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <nav class="nav-tabs">
+          <button class="tab-btn active" data-tab="tab-http">
+            HTTP Transactions (<span id="countHttp">0</span>)
+          </button>
+          <button class="tab-btn" data-tab="tab-ws">
+            WebSocket Streams (<span id="countWs">0</span>)
+          </button>
+          <button class="tab-btn" data-tab="tab-errors">
+            Diagnostics & Errors (<span id="countErrors">0</span>)
+          </button>
+        </nav>
+
+        <!-- Tab 1: HTTP Transactions -->
+        <section class="tab-pane active" id="tab-http">
+          <div class="toolbar">
+            <div class="search-box">
+              <span class="search-icon">🔍</span>
+              <input type="text" id="httpSearch" placeholder="Filter by URL or MIME type...">
+            </div>
+            <div class="filter-group">
+              <select id="filterMethod">
+                <option value="">All Methods</option>
+                <option value="GET">GET</option>
+                <option value="POST">POST</option>
+                <option value="PUT">PUT</option>
+                <option value="DELETE">DELETE</option>
+                <option value="PATCH">PATCH</option>
+              </select>
+              <select id="filterStatus">
+                <option value="">All Statuses</option>
+                <option value="200">200 OK</option>
+                <option value="201">201 Created</option>
+                <option value="204">204 No Content</option>
+                <option value="304">304 Not Modified</option>
+                <option value="400">400 Bad Request</option>
+                <option value="401">401 Unauthorized</option>
+                <option value="403">403 Forbidden</option>
+                <option value="404">404 Not Found</option>
+                <option value="500">500 Server Error</option>
+              </select>
+              <select id="filterType">
+                <option value="">All Types</option>
+                <option value="Fetch">Fetch</option>
+                <option value="XHR">XHR</option>
+                <option value="Document">Document</option>
+                <option value="Script">Script</option>
+                <option value="Stylesheet">Stylesheet</option>
+                <option value="Image">Image</option>
+                <option value="Font">Font</option>
+                <option value="WebSocket">WebSocket</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="table-container">
+            <table class="traffic-table" id="httpTable">
+              <thead>
+                <tr>
+                  <th style="width: 70px;">Status</th>
+                  <th style="width: 80px;">Method</th>
+                  <th>URL</th>
+                  <th style="width: 100px;">Type</th>
+                  <th style="width: 130px;">MIME</th>
+                  <th style="width: 90px;">Duration</th>
+                  <th style="width: 90px;">Time</th>
+                </tr>
+              </thead>
+              <tbody id="httpTableBody">
+                <tr><td colspan="7" class="placeholder-cell">Select a session to view traffic.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Tab 2: WebSocket Streams -->
+        <section class="tab-pane" id="tab-ws">
+          <div class="ws-layout">
+            <div class="ws-conns-panel">
+              <h4>Active Connections</h4>
+              <div id="wsConnList" class="ws-conn-list"></div>
+            </div>
+            <div class="ws-messages-panel">
+              <div class="ws-messages-header">
+                <h4>Message Frames</h4>
+                <div class="ws-filter">
+                  <button class="chip active" data-dir="all">All</button>
+                  <button class="chip" data-dir="0">⬆ Sent</button>
+                  <button class="chip" data-dir="1">⬇ Received</button>
+                </div>
+              </div>
+              <div class="ws-messages-list" id="wsMessagesList">
+                <div class="placeholder-cell">Select a WebSocket connection to view frames.</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Tab 3: Diagnostics & Errors -->
+        <section class="tab-pane" id="tab-errors">
+          <div class="table-container">
+            <table class="traffic-table">
+              <thead>
+                <tr>
+                  <th style="width: 120px;">Request ID</th>
+                  <th style="width: 140px;">Event Type</th>
+                  <th>Error Description</th>
+                  <th style="width: 180px;">Timestamp</th>
+                </tr>
+              </thead>
+              <tbody id="errorsTableBody">
+                <tr><td colspan="4" class="placeholder-cell">No capture errors or warnings reported.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+
+      <!-- Slide-Out Inspector Drawer -->
+      <aside class="inspector-drawer" id="inspectorDrawer">
+        <div class="drawer-header">
+          <div class="drawer-title" id="drawerTitle">Request Details</div>
+          <button class="btn-icon" id="btnCloseDrawer">✕</button>
+        </div>
+        <div class="drawer-tabs">
+          <button class="drawer-tab-btn active" data-dtab="dtab-headers">Headers</button>
+          <button class="drawer-tab-btn" data-dtab="dtab-payload">Payload / Body</button>
+          <button class="drawer-tab-btn" data-dtab="dtab-response">Response Body</button>
+        </div>
+        <div class="drawer-content">
+          <!-- Drawer Tab: Headers -->
+          <div class="drawer-pane active" id="dtab-headers">
+            <div class="section-block">
+              <h5>General</h5>
+              <div class="kv-grid" id="generalHeaders"></div>
+            </div>
+            <div class="section-block">
+              <h5>Request Headers (<span id="reqHeadersCount">0</span>)</h5>
+              <div class="kv-grid" id="reqHeaders"></div>
+            </div>
+            <div class="section-block">
+              <h5>Response Headers (<span id="respHeadersCount">0</span>)</h5>
+              <div class="kv-grid" id="respHeaders"></div>
+            </div>
+          </div>
+
+          <!-- Drawer Tab: Request Payload -->
+          <div class="drawer-pane" id="dtab-payload">
+            <div class="payload-actions">
+              <span id="reqPayloadMeta">No request payload</span>
+              <button class="btn btn-sm btn-secondary" id="btnCopyReqPayload" style="display:none;">Copy</button>
+            </div>
+            <pre class="code-box" id="reqPayloadContent"></pre>
+          </div>
+
+          <!-- Drawer Tab: Response Payload -->
+          <div class="drawer-pane" id="dtab-response">
+            <div class="payload-actions">
+              <span id="respPayloadMeta">No response body captured</span>
+              <div class="btn-group">
+                <button class="btn btn-sm btn-secondary" id="btnCopyRespPayload" style="display:none;">Copy</button>
+                <a class="btn btn-sm btn-primary" id="btnDownloadRespPayload" style="display:none;" target="_blank">Download Raw</a>
+              </div>
+            </div>
+            <pre class="code-box" id="respPayloadContent"></pre>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script src="/viewer.js"></script>
+</body>
+</html>

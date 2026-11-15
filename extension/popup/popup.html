@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Traffic Recorder</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="popup-container">
+    <!-- Top Brand Header -->
+    <header class="header">
+      <div class="brand">
+        <span class="logo">⚡</span>
+        <div class="brand-text">
+          <h1>Traffic Recorder</h1>
+          <span class="subtitle">CDP Network Visibility</span>
+        </div>
+      </div>
+      <div class="status-indicator" id="statusIndicator">
+        <span class="status-dot"></span>
+        <span class="status-label" id="statusLabel">IDLE</span>
+      </div>
+    </header>
+
+    <!-- Server Connection Card -->
+    <div class="card server-card" id="serverCard">
+      <div class="card-left">
+        <span class="server-dot offline" id="serverDot"></span>
+        <div class="server-info">
+          <span class="server-title">Companion Server</span>
+          <span class="server-desc" id="serverDesc">Checking 127.0.0.1:8765...</span>
+        </div>
+      </div>
+      <a href="http://127.0.0.1:8765/" target="_blank" class="btn-link" id="linkOpenViewer" title="Open Web Explorer">
+        Explorer ↗
+      </a>
+    </div>
+
+    <!-- Active Tab Info -->
+    <div class="card tab-card">
+      <div class="tab-label">TARGET BROWSER TAB</div>
+      <div class="tab-title" id="tabTitle">Loading tab information...</div>
+      <div class="tab-url" id="tabUrl">—</div>
+    </div>
+
+    <!-- Standby Info Banner -->
+    <div class="standby-banner" id="standbyBanner" style="display: none;">
+      <span class="standby-icon">⏳</span>
+      <div class="standby-text">
+        <strong>Standby Active:</strong> Waiting for you to enter a URL. Recording will start automatically on navigation!
+      </div>
+    </div>
+
+    <!-- Primary Action Button -->
+    <button class="btn btn-record" id="btnToggleRecord">
+      <span class="btn-icon">⏺</span>
+      <span class="btn-text" id="btnToggleText">Start Recording This Tab</span>
+    </button>
+
+    <!-- Live Recording Dashboard -->
+    <div class="metrics-grid" id="metricsGrid" style="display: none;">
+      <div class="metric-box">
+        <span class="metric-val" id="metricElapsed">00:00</span>
+        <span class="metric-lbl">ELAPSED</span>
+      </div>
+      <div class="metric-box">
+        <span class="metric-val" id="metricRequests">0</span>
+        <span class="metric-lbl">REQUESTS</span>
+      </div>
+      <div class="metric-box">
+        <span class="metric-val" id="metricResponses">0</span>
+        <span class="metric-lbl">RESPONSES</span>
+      </div>
+      <div class="metric-box">
+        <span class="metric-val" id="metricWs">0</span>
+        <span class="metric-lbl">WS FRAMES</span>
+      </div>
+    </div>
+
+    <!-- Live Transmission Status -->
+    <div class="queue-status" id="queueStatus" style="display: none;">
+      <span>Queued: <strong id="queueCount">0</strong></span>
+      <span>Persisted to SQLite: <strong id="persistedCount">0</strong></span>
+    </div>
+
+    <!-- Settings Toggle -->
+    <div class="settings-section">
+      <button class="btn-text-link" id="btnToggleSettings">⚙ Server Settings</button>
+      <div class="settings-form" id="settingsForm" style="display: none;">
+        <label>Server URL:
+          <input type="text" id="inputServerUrl" value="http://127.0.0.1:8765" placeholder="http://127.0.0.1:8765">
+        </label>
+        <label>API Token (optional):
+          <input type="password" id="inputApiToken" placeholder="Leave empty for local dev">
+        </label>
+        <button class="btn btn-secondary btn-save-settings" id="btnSaveSettings">Save Configuration</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

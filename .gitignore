@@ -1,0 +1,19 @@
+# Python bytecode and virtual environments
+__pycache__/
+*.py[cod]
+*$py.class
+*.env
+.venv/
+venv/
+ENV/
+env/
+
+# Database files and persistent traffic recording data
+server/data/
+data/
+*.db
+*.db-wal
+*.db-shm
+
+# Chat exports
+chrome-traffic-visibility-*.md
