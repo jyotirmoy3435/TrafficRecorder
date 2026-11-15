@@ -15,7 +15,7 @@ High-fidelity browser network traffic recorder powered by the **Chrome DevTools 
 2. Enable **Developer mode** using the toggle switch in the top right corner.
 3. Click the **Load unpacked** button.
 4. Select the `extension` directory.
-5. The **Traffic Recorder** icon (`⚡`) will appear in your Chrome toolbar. Pin it for quick access.
+5. The **Traffic Recorder** icon (<img src="icons/icon16.png" width="16" height="16" alt="Traffic Recorder icon" style="vertical-align: middle;" />) will appear in your Chrome toolbar. Pin it for quick access.
 
 ## How to Use
 

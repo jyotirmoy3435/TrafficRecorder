@@ -23,7 +23,7 @@ You can verify it's running by opening `http://127.0.0.1:8765/` in your browser.
 2. Toggle on **Developer mode** in the top right corner.
 3. Click **Load unpacked**.
 4. Choose the `extension` folder.
-5. Pin the extension icon (`⚡`) to your browser toolbar.
+5. Pin the extension icon (<img src="extension/icons/icon16.png" width="16" height="16" alt="Traffic Recorder icon" style="vertical-align: middle;" />) to your browser toolbar.
 
 ### Step 3: Record Traffic
 
